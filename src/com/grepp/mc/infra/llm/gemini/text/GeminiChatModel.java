@@ -1,7 +1,11 @@
-package com.grepp.mc.infra.llm;
+package com.grepp.mc.infra.llm.gemini.text;
 
 import com.google.gson.Gson;
+import com.grepp.mc.infra.llm.ChatModel;
+import com.grepp.mc.infra.llm.Request;
+import com.grepp.mc.infra.llm.Response;
 import com.grepp.mc.infra.llm.gemini.text.vo.RequestDocument;
+import com.grepp.mc.infra.llm.gemini.text.vo.ResponseDocument;
 import java.io.IOException;
 import java.net.URI;
 import java.net.http.HttpClient;
@@ -12,11 +16,18 @@ import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
 import java.time.Duration;
 
-public class GeminiChatModel {
+public class GeminiChatModel implements ChatModel {
 
-    public static void invoke(RequestDocument doc) {
+    private static final String API_URL = "https://generativelanguage.googleapis.com"
+        + "/v1beta"
+        + "/models"
+        + "/gemini-2.0-flash:generateContent";
+    private static final String API_KEY = "AIzaSyBbhzFA1WJ2m-ebtlY7Bq3yQo3873IzAM4";
 
-        String body = new Gson().toJson(doc);
+    @Override
+    public Response invoke(Request request) {
+
+        String body = request.toJson();
 
         try (
             HttpClient client = HttpClient.newBuilder()
@@ -24,21 +35,20 @@ public class GeminiChatModel {
                 .connectTimeout(Duration.ofSeconds(20))
                 .build();
         ) {
-            HttpRequest request = HttpRequest.newBuilder()
+            HttpRequest requestClient = HttpRequest.newBuilder()
                 .uri(URI.create(
-                    "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyBbhzFA1WJ2m-ebtlY7Bq3yQo3873IzAM4"))
+                    API_URL + "?key=" + API_KEY))
                 .timeout(Duration.ofMinutes(2))
                 .header("Content-Type", "application/json")
                 .POST(BodyPublishers.ofString(body))
                 .build();
 
-            HttpResponse<String> response = client.send(request, BodyHandlers.ofString());
+            HttpResponse<String> response = client.send(requestClient, BodyHandlers.ofString());
             System.out.println(response.statusCode());
-            System.out.println(response.body());
+            return new TextResponse(response.body());
 
         } catch (IOException | InterruptedException e) {
             throw new RuntimeException(e);
         }
-
     }
 }

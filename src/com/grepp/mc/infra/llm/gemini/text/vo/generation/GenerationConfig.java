@@ -1,7 +1,11 @@
 package com.grepp.mc.infra.llm.gemini.text.vo.generation;
 
+import com.google.gson.annotations.SerializedName;
+
 public record GenerationConfig<T>(
+    @SerializedName("response_mime_type")
     String responseMimeType,
+    @SerializedName("response_schema")
     Schema<T> responseSchema
 ) {
 
