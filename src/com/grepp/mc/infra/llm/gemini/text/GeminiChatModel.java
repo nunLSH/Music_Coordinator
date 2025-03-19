@@ -21,7 +21,7 @@ public class GeminiChatModel implements ChatModel {
     private static final String API_URL = "https://generativelanguage.googleapis.com"
         + "/v1beta"
         + "/models"
-        + "/gemini-2.0-flash:generateContent";
+        + "/gemini-1.5-flash:generateContent";
     private static final String API_KEY = "AIzaSyBbhzFA1WJ2m-ebtlY7Bq3yQo3873IzAM4";
 
     @Override
@@ -44,7 +44,6 @@ public class GeminiChatModel implements ChatModel {
                 .build();
 
             HttpResponse<String> response = client.send(requestClient, BodyHandlers.ofString());
-            System.out.println(response.statusCode());
             return new TextResponse(response.body());
 
         } catch (IOException | InterruptedException e) {

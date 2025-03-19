@@ -18,7 +18,7 @@ public class TextResponse implements Response {
     }
 
     @Override
-    public Map<String, Object> response() {
+    public List<Map<String, Object>> response() {
         Gson gson = new GsonBuilder()
             .serializeNulls()
             .setPrettyPrinting()
@@ -33,6 +33,6 @@ public class TextResponse implements Response {
 
         TypeToken<List<Map<String, Object>>> listType = new TypeToken<>() {};
         List<Map<String, Object>> res = gson.fromJson(partText, listType.getType());
-        return Map.of("data", res);
+        return gson.fromJson(partText, listType.getType());
     }
 }
